@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPower - Simulador de Redes Elétricas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar for Creative Mode -->
+        <div id="sidebar" class="hidden">
+            <h2 class="sidebar-title">INVENTÁRIO</h2>
+            <div id="category-selector"></div>
+            <div id="item-list"></div>
+        </div>
+
+        <!-- Main Game Area -->
+        <main id="game-container">
+            <header id="top-bar">
+                <div class="top-left">
+                    <button id="btn-menu" class="btn-secondary">⮌ Menu</button>
+                    <button id="btn-power" class="btn-power-off">▶ LIGAR REDE</button>
+                    <span id="lbl-info">Planeje a rede</span>
+                </div>
+                <div class="top-right">
+                    <div id="hud-stats">
+                        <span id="lbl-fase">FASE 1/25</span>
+                        <span id="lbl-diff">FÁCIL</span>
+                    </div>
+                    <button id="btn-reset" class="btn-danger">Reset Nível</button>
+                </div>
+            </header>
+
+            <canvas id="game-canvas"></canvas>
+
+            <div id="sustainability-bar" class="hidden">
+                <div id="sus-progress-container">
+                    <div id="sus-progress"></div>
+                </div>
+                <span id="sus-label">Sustentabilidade: 100%</span>
+            </div>
+
+            <!-- Overlays -->
+            <div id="menu-overlay" class="overlay">
+                <div class="card">
+                    <h1>EcoPower ⚡</h1>
+                    <p class="subtitle">Simulador de Redes Elétricas</p>
+                    <div class="menu-options">
+                        <button onclick="startGame('EDUCACIONAL')">Modo Educativo</button>
+                        <button onclick="startGame('SUSTENTAVEL')">Modo Sustentável</button>
+                        <button onclick="startGame('CRIATIVO')">Modo Criativo</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="help-btn-container">
+                <button id="btn-help" class="btn-help">❓ Como Jogar?</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="help-title">Guia Rápido</h2>
+            <div id="help-text"></div>
+            <button onclick="closeModal('help-modal')" class="btn-danger">Fechar</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
