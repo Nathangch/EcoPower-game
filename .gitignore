@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+build/
+*.spec
+.gemini/
+.agents/
+.agent/
+_agents/
+_agent/
+brain/
