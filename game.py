@@ -32,6 +32,7 @@ class Node:
         self.demanda = 0
         self.active = True
         self.radius = 35
+        self.cost_paid = 0
 
 class Generator(Node):
     def __init__(self, x, y, name, capacity, gen_type="PADRAO"):
@@ -77,6 +78,7 @@ class Edge:
         self.carga_atual = 0
         self.failed = False
         self.cable_type = cable_type # ALUMINIO, COBRE
+        self.cost_paid = 0
         
     def get_other(self, node):
         return self.n2 if self.n1 == node else self.n1
@@ -880,7 +882,7 @@ class App(tk.Tk):
                 elif item == "Eólico":
                     self.game.nodes.append(Generator(x, y, f"Eol {len(self.game.nodes)+1}", 20, "EOLICA"))
                 elif item == "Carvão":
-                    self.game.nodes.append(Generator(x, y, f"Termo-C {len(self.game.nodes)+1}", 35, "TERMELETRICA"))
+                    self.game.nodes.append(Generator(x, y, f"Termo-C {len(self.game.nodes)+1}", 35, "CARVAO"))
                 elif item == "Termelétrica":
                     self.game.nodes.append(Generator(x, y, f"Termo {len(self.game.nodes)+1}", 50, "TERMELETRICA"))
                 elif item == "Nuclear":
@@ -899,6 +901,10 @@ class App(tk.Tk):
                     self.game.nodes.append(City(x, y, f"Cid G {len(self.game.nodes)+1}", 30))
                 elif item == "Poste":
                     self.game.nodes.append(Poste(x, y, f"Pte {len(self.game.nodes)+1}"))
+                
+                # Record cost for refund
+                if self.game.mode == "SUSTENTAVEL":
+                    self.game.nodes[-1].cost_paid = price
                 self.draw_grid()
                 return
 
@@ -946,6 +952,8 @@ class App(tk.Tk):
                         c_type = "ALUMINIO"
                         
                     new_edge = Edge(self.selected_node, clicked_node, cap, c_type)
+                    if self.game.mode == "SUSTENTAVEL":
+                        new_edge.cost_paid = price
                     self.game.edges.append(new_edge)
                     self.game.update_flow()
                     self.selected_node = None
@@ -961,11 +969,7 @@ class App(tk.Tk):
         if edge:
             # Refund logic for sustainable mode
             if self.game.mode == "SUSTENTAVEL":
-                item_name = "Cabo Baixa"
-                if edge.cable_type == "MEDIA": item_name = "Cabo Média"
-                elif edge.cable_type == "ALTA": item_name = "Cabo Alta"
-                elif edge.cable_type == "SUPER": item_name = "Supercondutor"
-                self.game.money += self.game.get_item_price(item_name)
+                self.game.money += edge.cost_paid
                 if self.lbl_money: self.lbl_money.config(text=f"Orçamento: ${self.game.money}")
                 
             self.game.edges.remove(edge)
@@ -978,24 +982,8 @@ class App(tk.Tk):
                 if node:
                     # Refund logic for sustainable mode
                     if self.game.mode == "SUSTENTAVEL":
-                        item_name = None
-                        if isinstance(node, Generator):
-                            mapping = {
-                                "SOLAR": "Solar",
-                                "EOLICA": "Eólico",
-                                "TERMELETRICA": "Termelétrica",
-                                "NUCLEAR": "Nuclear",
-                                "HIDRELETRICA": "Hidrelétrica"
-                            }
-                            item_name = mapping.get(node.gen_type, "Gerador")
-                        elif isinstance(node, BatteryNode): item_name = "Bateria"
-                        elif isinstance(node, Poste): item_name = "Poste"
-                        elif isinstance(node, Substation): item_name = "Subestação"
-                        elif isinstance(node, City): item_name = "Cid. Pequena" if node.demanda == 10 else "Cid. Grande"
-                        
-                        if item_name:
-                            self.game.money += self.game.get_item_price(item_name)
-                            if self.lbl_money: self.lbl_money.config(text=f"Orçamento: ${self.game.money}")
+                        self.game.money += node.cost_paid
+                        if self.lbl_money: self.lbl_money.config(text=f"Orçamento: ${self.game.money}")
                     
                     self.game.nodes.remove(node)
                     # Also remove connected edges
@@ -1229,7 +1217,7 @@ class App(tk.Tk):
         self.flash_state = not self.flash_state
         
         # FINAL BOSS: AI Sabotage Logic
-        if self.game.mode == "EDUCACIONAL" and self.game.difficulty == "Difícil" and self.game.current_level == 10 and self.game.power_on:
+        if self.game.mode == "EDUCACIONAL" and self.game.difficulty == "Difícil" and self.game.current_level == 10 and self.game.power_on and self.game.state == "RUNNING":
             self.sabotage_timer -= 1
             if self.sabotage_timer <= 0:
                 self.ai_sabotage()
