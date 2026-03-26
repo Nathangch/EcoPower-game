@@ -462,7 +462,22 @@ class Game {
             "Redundância: Criar caminhos alternativos garante que, se um cabo falhar, a cidade não pare. É o conceito de resiliência elétrica urbana.",
             "Estabilidade Térmica: Ao distribuir a carga, você evitou que os elétrons sobrecarregassem as subestações. Menos estresse significa menos blackouts.",
             "Margem de Segurança: Engenheiros nunca trabalham no limite. Deixar folga nos cabos permite que a cidade cresça sem precisar refazer toda a fiação.",
-            "Controle de Fluxo: Agora você domina como a energia se divide. A eletricidade sempre busca o caminho de menor resistência, mas você a guiou com maestria."
+            "Controle de Fluxo: Agora você domina como a energia se divide. A eletricidade sempre busca o caminho de menor resistência, mas você a guiou com maestria.",
+            "Gerenciamento de Pico: Você distribuiu o esforço de geradores potentes. Antecipar onde a carga será maior é vital para não saturar o centro da cidade.",
+            "Arquitetura em Estrela: Usar uma subestação central facilita o monitoramento e permite isolar falhas sem derrubar o sistema inteiro.",
+            "Eficiência Magnética: Você evitou gargalos. Quando muitos elétrons tentam passar por um cabo fino, a resistência gera calor e desperdício de energia.",
+            "Setorização: Ao separar áreas industriais de residenciais, você garantiu que uma falha em uma fábrica não desligasse o hospital vizinho.",
+            "Ponto de Entrega: Você atingiu a metade do caminho! O uso de estações intermediárias garante que a voltagem chegue estabilizada nas tomadas.",
+            "Estabilidade do Sistema: Adicionar fontes em uma malha ativa exige cuidado. Você soube integrar a nova geração sem desequilibrar a carga existente.",
+            "Manutenção Geográfica: Você levou energia para longe. Cabos longos perdem voltagem; suas estações de apoio reforçaram a qualidade da entrega.",
+            "Infraestrutura Crítica: Você provou que entende os limites térmicos. Economizar em cabos gera um risco inaceitável de blackout econômico.",
+            "Otimização de Fluxo: A energia elétrica não escolhe o caminho que você quer, mas o mais fácil. Você a domou através de rotas seguras.",
+            "Resiliência sob Estresse: Mesmo com alta demanda, sua rede se manteve equilibrada. Um sistema estável opera de forma silenciosa e eficiente.",
+            "Sistemas de Grande Porte: Você gerenciou múltiplas fontes e consumidores. A sincronia entre geração e demanda é o coração do sistema elétrico.",
+            "Smart Grids: Antecipar gargalos e reforçar a malha antes de ligar os disjuntores é a base das redes inteligentes do futuro.",
+            "Segurança N-1: O sistema deve operar mesmo se UMA conexão falhar. Sua rede sobreviveu a imprevistos técnicos e manteve a ordem.",
+            "Engenharia de Proteção: Ver o grid como um todo, e não apenas fios isolados, permitiu que você resolvesse este layout espacial complexo.",
+            "Mestre da Engenharia: Parabéns! Você domina a geração e distribuição. Está pronto para projetar grades elétricas seguras e eficientes!"
         ];
         return messages[this.currentLevel - 1] || "Parabéns por completar este desafio de engenharia!";
     }
