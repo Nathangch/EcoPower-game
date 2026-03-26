@@ -7,16 +7,22 @@ EcoPower is a high-fidelity educational and sandbox electrical network simulator
 - **Sustainable Mode:** Advanced simulation with renewable sources (Solar, Wind, Hydro), world cycles, and environmental metrics.
 - **Creative Mode:** A sandbox tool to build complex cities and distribution networks from scratch.
 
-## 🚀 How to Run (Desktop)
-1. Ensure you have Python 3.x installed.
-2. Run the main file:
-   ```bash
-   python game.py
-   ```
+## 🚀 How to Run
+### 🌐 Browser (Recommended)
+You can play immediately through the link:
+[**EcoPower Web**](https://nathangch.github.io/EcoPower-game/)
+(Compatible with Chrome, Edge, and Firefox)
 
----
-> [!NOTE]  
-> **WEB VERSION (In Progress):** Standard Python/Tkinter does not run natively in browsers. We are currently porting the core simulation logic to a Web-compatible version (React/Canvas) to enable browser play via GitHub Pages.
+### 🖥️ Desktop (Standalone)
+Just download and run:
+`EcoPower.exe`
+(No Python installation needed!)
+
+### 🐍 Desktop (Script)
+If you have Python installed:
+```bash
+python game.py
+```
 
 ---
 ## 🛠️ Features
