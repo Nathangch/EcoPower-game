@@ -13,6 +13,7 @@
         <div id="sidebar" class="hidden">
             <h2 class="sidebar-title">INVENTÁRIO</h2>
             <div id="category-selector"></div>
+            <div id="item-separator"></div>
             <div id="item-list"></div>
         </div>
 
@@ -25,9 +26,13 @@
                     <span id="lbl-info">Planeje a rede</span>
                 </div>
                 <div class="top-right">
+                    <div id="world-hud" class="hidden">
+                        <span id="lbl-time">🕒 12:00</span>
+                        <span id="lbl-env">☀️ 100% | 🌬️ 50%</span>
+                    </div>
                     <div id="hud-stats">
                         <span id="lbl-fase">FASE 1/25</span>
-                        <span id="lbl-diff">FÁCIL</span>
+                        <span id="lbl-diff">Dificuldade: FÁCIL</span>
                     </div>
                     <button id="btn-reset" class="btn-danger">Reset Nível</button>
                 </div>
@@ -35,11 +40,11 @@
 
             <canvas id="game-canvas"></canvas>
 
-            <div id="sustainability-bar" class="hidden">
-                <div id="sus-progress-container">
+            <div id="sustainability-container" class="hidden">
+                <div class="sus-bar-bg">
                     <div id="sus-progress"></div>
                 </div>
-                <span id="sus-label">Sustentabilidade: 100%</span>
+                <span id="lbl-sus">Sustentabilidade: 100%</span>
             </div>
 
             <!-- Overlays -->
@@ -61,9 +66,21 @@
         </main>
     </div>
 
-    <!-- Modals -->
+    <!-- Victory Modal -->
+    <div id="victory-modal" class="modal hidden">
+        <div class="modal-content victory-card">
+            <h2 id="vic-title">🏆 FASE CONCLUÍDA!</h2>
+            <div class="msg-box">
+                <p class="msg-label">O que você aprendeu:</p>
+                <p id="vic-msg"></p>
+            </div>
+            <button id="btn-next" class="btn-success">PRÓXIMA FASE ➔</button>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
     <div id="help-modal" class="modal hidden">
-        <div class="modal-content">
+        <div class="modal-content help-card">
             <h2 id="help-title">Guia Rápido</h2>
             <div id="help-text"></div>
             <button onclick="closeModal('help-modal')" class="btn-danger">Fechar</button>
