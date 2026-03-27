@@ -581,14 +581,30 @@ class App(tk.Tk):
         lbl_medio = tk.Label(self.current_frame, text="Falhas isoladas ocorrem com sobrecarga.", bg="#2E3440", fg="#ECEFF4", font=("Arial", 11))
         lbl_medio.pack(pady=(0, 15))
         
-        btn_dificil = tk.Button(self.current_frame, text="DIFÍCIL", command=lambda: self.start_game_with_diff("Difícil"), bg="#BF616A", fg="#2E3440", font=("Arial", 16, "bold"), width=20, relief="flat", cursor="hand2")
+        btn_dificil = tk.Button(self.current_frame, text="DIFÍCIL", command=lambda: self.start_game_with_diff("Difícil"), bg="#BF616A", fg="#ECEFF4", font=("Arial", 16, "bold"), width=20, relief="flat", cursor="hand2")
         btn_dificil.pack(pady=5)
-        lbl_dificil = tk.Label(self.current_frame, text="Efeito cascata. Risco de Apagão Geral.", bg="#2E3440", fg="#ECEFF4", font=("Arial", 11))
-        lbl_dificil.pack(pady=(0, 15))
+        lbl_dificil = tk.Label(self.current_frame, text="Colapso em cascata no sistema.", bg="#2E3440", fg="#ECEFF4", font=("Arial", 11))
+        lbl_dificil.pack(pady=(0, 30))
         
-        btn_back = tk.Button(self.current_frame, text="Voltar", command=self.show_mode_selection, bg="#4C566A", fg="#ECEFF4", font=("Arial", 14), width=15, relief="flat", cursor="hand2")
-        btn_back.pack(pady=20)
+        # JUMP TO BOSS section
+        lbl_jump = tk.Label(self.current_frame, text="🧪 MODO DE TESTE (PULAR FASES)", bg="#2E3440", fg="#D08770", font=("Arial", 12, "bold"))
+        lbl_jump.pack(pady=10)
         
+        jump_frame = tk.Frame(self.current_frame, bg="#2E3440")
+        jump_frame.pack(pady=5)
+        
+        tk.Button(jump_frame, text="Pular p/ BOSS FÁCIL (Lvl 10)", command=lambda: self.jump_to_boss("Fácil"), bg="#4C566A", fg="#A3BE8C", font=("Arial", 10, "bold"), width=25, relief="flat", cursor="hand2").pack(side=tk.LEFT, padx=5)
+        tk.Button(jump_frame, text="Pular p/ BOSS MÉDIO (Lvl 10)", command=lambda: self.jump_to_boss("Médio"), bg="#4C566A", fg="#EBCB8B", font=("Arial", 10, "bold"), width=25, relief="flat", cursor="hand2").pack(side=tk.LEFT, padx=5)
+        tk.Button(jump_frame, text="Pular p/ BOSS FINAL - DIFÍCIL", command=lambda: self.jump_to_boss("Difícil"), bg="#4C566A", fg="#BF616A", font=("Arial", 10, "bold"), width=25, relief="flat", cursor="hand2").pack(side=tk.LEFT, padx=5)
+        
+        btn_back = tk.Button(self.current_frame, text="⮌ Voltar ao Menu", command=self.show_menu, bg="#4C566A", fg="#ECEFF4", font=("Arial", 14, "bold"), width=20, relief="flat", cursor="hand2")
+        btn_back.pack(pady=40)
+
+    def jump_to_boss(self, diff):
+        self.game.difficulty = diff
+        self.game.current_level = 10
+        self.game.mode = "EDUCACIONAL"
+        self.show_game()
     def start_game_with_diff(self, diff):
         self.game.difficulty = diff
         self.game.current_level = 1
