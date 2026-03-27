@@ -148,6 +148,37 @@ class GameState:
             # Adjust the last generator to cover the gap
             gens[-1] += (total_dem - total_gen)
             
+        # Level 10 Boss Generation Logic
+        if lvl == 10 and self.mode == "EDUCACIONAL":
+            if diff == "Fácil": # Boss 1: Sobrecarga Simples
+                # 2 Generators (30 each), 1 City (50 demand)
+                # Goal: Force player to use multiple parallel cables (cap 20 each)
+                self.nodes.append(Generator(150, 300, "Gerador Alpha", 30, "PADRAO"))
+                self.nodes.append(Generator(150, 450, "Gerador Beta", 30, "PADRAO"))
+                self.nodes.append(City(850, 375, "Metrópole", 50))
+                return
+            elif diff == "Médio": # Boss 3: Fluxo Caótico
+                # 2 Generators, 3 substations, 2 cities
+                # Distance based loss already handled in distribution, just need a spread layout
+                self.nodes.append(Generator(100, 150, "Gerador 1", 30, "PADRAO"))
+                self.nodes.append(Generator(100, 500, "Gerador 2", 30, "PADRAO"))
+                self.nodes.append(Substation(400, 325, "Sub Central"))
+                self.nodes.append(Substation(600, 150, "Sub Norte"))
+                self.nodes.append(Substation(600, 550, "Sub Sul"))
+                self.nodes.append(City(900, 200, "Cidade Norte", 25))
+                self.nodes.append(City(900, 500, "Cidade Sul", 25))
+                return
+            elif diff == "Difícil": # Boss 6: IA da Rede
+                # 3 Generators, 4 Substations, 3 Cities.
+                # Redundancy (N-1) is key here.
+                for i in range(3):
+                    self.nodes.append(Generator(100, 150+i*200, f"G{i+1}", 40, "PADRAO"))
+                    self.nodes.append(City(900, 150+i*200, f"C{i+1}", 30))
+                for i in range(4):
+                    self.nodes.append(Substation(500, 100+i*150, f"S{i+1}"))
+                return
+
+        # Normal Level Generation
         for i, cap in enumerate(gens):
             x = random.randint(80, 200)
             y = 100 + (500 // max(1, num_g)) * i + random.randint(-15, 15)
@@ -335,7 +366,8 @@ class GameState:
             
         overloaded = [e for e in self.edges if e.carga_atual > e.capacidade_maxima and not e.failed]
         if overloaded:
-            if self.difficulty == "Médio":
+            # Medium, or Easy Level 10 Boss
+            if self.difficulty == "Médio" or (self.difficulty == "Fácil" and self.current_level == 10):
                 # Fail one edge
                 e = overloaded[0]
                 e.failed = True
@@ -596,17 +628,8 @@ class App(tk.Tk):
         if self.game.mode != "CRIATIVO": # Only build initial level if not creative mode
             self.game.build_initial_level()
             
-        # BOSS EVENT MESSAGE - Level 10 Easy
-        if self.game.mode == "EDUCACIONAL" and self.game.difficulty == "Fácil" and self.game.current_level == 10:
-            self.after(500, self.show_boss_intro)
-            
-        # BOSS EVENT MESSAGE - Level 10 Medium
-        if self.game.mode == "EDUCACIONAL" and self.game.difficulty == "Médio" and self.game.current_level == 10:
-            self.after(500, self.show_boss3_intro)
-            
-        # BOSS EVENT MESSAGE - Level 10 Hard (FINAL BOSS)
-        if self.game.mode == "EDUCACIONAL" and self.game.difficulty == "Difícil" and self.game.current_level == 10:
-            self.after(500, self.show_boss6_intro)
+        # Check for Boss Events
+        self.check_boss_event()
             
         self.selected_node = None
         self.game.power_on = False # Initialize power state
@@ -614,6 +637,9 @@ class App(tk.Tk):
         
         self.setup_ui()
         self.draw_grid()
+        
+        # Check for Boss Events AFTER UI is setup
+        self.after(1000, self.check_boss_event)
 
     def setup_ui(self):
         for widget in self.winfo_children(): widget.destroy()
@@ -797,6 +823,20 @@ class App(tk.Tk):
         self.game.current_level += 1
         self.victory_shown = False
         self.reset_level()
+        # Boss intro should be shown after level reset and UI update
+        self.after(1000, self.check_boss_event)
+
+    def check_boss_event(self):
+        # Ensure we are in a running game state and on level 10
+        if not hasattr(self, 'current_frame') or not self.current_frame.winfo_exists(): return
+        
+        if self.game.mode == "EDUCACIONAL" and self.game.current_level == 10:
+            if self.game.difficulty == "Fácil":
+                self.show_boss_intro()
+            elif self.game.difficulty == "Médio":
+                self.show_boss3_intro()
+            elif self.game.difficulty == "Difícil":
+                self.show_boss6_intro()
 
     def get_node_at(self, x, y):
         for n in self.game.nodes:
