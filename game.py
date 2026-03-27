@@ -100,6 +100,7 @@ class GameState:
         self.mode = "EDUCACIONAL" # "EDUCACIONAL", "SUSTENTAVEL", "CRIATIVO"
         self.creative_item = "Cabo Baixa"
         self.money = 0
+        self.boss_energy_lost = 0 # Track for Boss 3 visuals
         self.build_initial_level()
         
     def build_initial_level(self):
@@ -215,6 +216,7 @@ class GameState:
         return prices.get(item_name, 0)
 
     def update_flow(self):
+        self.boss_energy_lost = 0 # Reset each update
         if not self.power_on:
             for n in self.nodes: n.energy_atual = 0
             for e in self.edges: e.carga_atual = 0
@@ -325,8 +327,7 @@ class GameState:
                         if reached:
                             current.energy_atual += 1
                         else:
-                            # Energy lost in transit - maybe show a message one time?
-                            pass
+                            self.boss_energy_lost += 1
                             
                         power_moved = True
             if not power_moved:
@@ -1137,6 +1138,30 @@ class App(tk.Tk):
             self.canvas.create_oval(self.selected_node.x-r, self.selected_node.y-r, 
                                     self.selected_node.x+r, self.selected_node.y+r, 
                                     outline="#88C0D0", width=3, dash=(6,6))
+
+        # BOSS SPECIAL OVERLAYS
+        if self.game.mode == "EDUCACIONAL" and self.game.current_level == 10:
+            if self.game.difficulty == "Médio" and self.game.boss_energy_lost > 0:
+                # Show energy loss in Fluxo Caótico
+                self.canvas.create_text(canvas_w/2, 130, text=f"⚠️ PERDA DE ENERGIA: -{self.game.boss_energy_lost} ⚡", 
+                                        fill="#EBCB8B", font=("Arial", 14, "bold"))
+                self.canvas.create_text(canvas_w/2, 160, text="Rotas muito longas dissipam eletricidade!", 
+                                        fill="#D8DEE9", font=("Arial", 10))
+            
+            elif self.game.difficulty == "Difícil" and self.game.power_on:
+                # Show AI Sabotage Warning
+                timer_color = "#BF616A" if self.sabotage_timer < 6 else "#EBCB8B"
+                self.canvas.create_text(canvas_w/2, 130, text="🤖 ALERTA DE SEGURANÇA: IA ATIVA 🤖", 
+                                        fill="#BF616A", font=("Arial", 14, "bold"))
+                self.canvas.create_text(canvas_w/2, 160, text=f"Próxima Sabotagem em: {self.sabotage_timer//2}s", 
+                                        fill=timer_color, font=("Arial", 12, "bold"))
+                
+            elif self.game.difficulty == "Fácil":
+                # Ensure Boss 1 overload warning is clear
+                any_overload = any(e.carga_atual > e.capacidade_maxima for e in self.game.edges if not e.failed)
+                if any_overload:
+                    self.canvas.create_text(canvas_w/2, 130, text="⚡ AVISO: SOBRECARGA DETECTADA ⚡", 
+                                            fill="#BF616A" if self.flash_state else "#D8DEE9", font=("Arial", 14, "bold"))
 
         self.draw_legend()
 
