@@ -863,16 +863,36 @@ class App(tk.Tk):
 
     def get_edge_at(self, x, y):
         for e in self.game.edges:
-            # Distance from point to line segment
+            # Calculate offset vector (must match drawing logic)
             px, py = e.n1.x, e.n1.y
             qx, qy = e.n2.x, e.n2.y
             
-            l2 = (px-qx)**2 + (py-qy)**2
+            pair_edges = [edge for edge in self.game.edges 
+                          if (edge.n1 == e.n1 and edge.n2 == e.n2) or 
+                             (edge.n1 == e.n2 and edge.n2 == e.n1)]
+            try:
+                idx = pair_edges.index(e)
+            except ValueError:
+                idx = 0
+            total = len(pair_edges)
+            offset_val = (idx - (total - 1) / 2) * 15 if total > 1 else 0
+            
+            dx = qx - px
+            dy = qy - py
+            dist = math.hypot(dx, dy)
+            if dist > 0:
+                ux, uy = -dy / dist, dx / dist
+                px_off, py_off = px + ux * offset_val, py + uy * offset_val
+                qx_off, qy_off = qx + ux * offset_val, qy + uy * offset_val
+            else:
+                px_off, py_off, qx_off, qy_off = px, py, qx, qy
+
+            l2 = (px_off-qx_off)**2 + (py_off-qy_off)**2
             if l2 == 0: continue
             
-            t = max(0, min(1, ((x-px)*(qx-px) + (y-py)*(qy-py)) / l2))
-            proj_x = px + t*(qx-px)
-            proj_y = py + t*(qy-py)
+            t = max(0, min(1, ((x-px_off)*(qx_off-px_off) + (y-py_off)*(qy_off-py_off)) / l2))
+            proj_x = px_off + t*(qx_off-px_off)
+            proj_y = py_off + t*(qy_off-py_off)
             
             if math.hypot(x - proj_x, y - proj_y) < 8:
                 return e
@@ -976,10 +996,8 @@ class App(tk.Tk):
                 self.selected_node = None
                 self.draw_grid()
             else:
-                exists = any((e.n1 == self.selected_node and e.n2 == clicked_node) or 
-                             (e.n1 == clicked_node and e.n2 == self.selected_node) 
-                             for e in self.game.edges)
-                if not exists:
+                # Remove the check 'if not exists' to allow parallel cables
+                if True: # Always allow creating a new edge
                     # Define edge capacity and type
                     cap = 5
                     c_type = "ALUMINIO" # Default
@@ -1005,7 +1023,14 @@ class App(tk.Tk):
                             self.game.money -= price
                             self.lbl_money.config(text=f"Orçamento: ${self.game.money}")
                     elif self.game.difficulty == "Fácil":
-                        cap = 8
+                        cap = 25 if self.game.current_level == 10 else 8
+                        c_type = "ALUMINIO"
+                    else: # Médio ou Difícil
+                        # Improve balance for Boss levels
+                        if self.game.current_level == 10:
+                            cap = 15 if self.game.difficulty == "Médio" else 10
+                        else:
+                            cap = 5
                         c_type = "ALUMINIO"
                         
                     new_edge = Edge(self.selected_node, clicked_node, cap, c_type)
@@ -1086,11 +1111,41 @@ class App(tk.Tk):
             else:
                 color = "#4C566A"
             
-            self.canvas.create_line(e.n1.x, e.n1.y, e.n2.x, e.n2.y, fill=color, width=width, dash=dash)
+            # Offset parallel edges
+            # 1. Count how many total edges between these two nodes
+            # and what is the index of this one.
+            pair_edges = [edge for edge in self.game.edges 
+                          if (edge.n1 == e.n1 and edge.n2 == e.n2) or 
+                             (edge.n1 == e.n2 and edge.n2 == e.n1)]
+            
+            try:
+                idx = pair_edges.index(e)
+            except ValueError:
+                idx = 0
+            
+            total = len(pair_edges)
+            offset_val = 0
+            if total > 1:
+                # Spread them out: -15, -5, 5, 15 etc.
+                spread = 15
+                offset_val = (idx - (total - 1) / 2) * spread
+            
+            # Calculate offset vector (perpendicular to redundant line)
+            dx = e.n2.x - e.n1.x
+            dy = e.n2.y - e.n1.y
+            dist = math.hypot(dx, dy)
+            if dist > 0:
+                ux, uy = -dy / dist, dx / dist # Perpendicular unit vector
+                x1, y1 = e.n1.x + ux * offset_val, e.n1.y + uy * offset_val
+                x2, y2 = e.n2.x + ux * offset_val, e.n2.y + uy * offset_val
+            else:
+                x1, y1, x2, y2 = e.n1.x, e.n1.y, e.n2.x, e.n2.y
+
+            self.canvas.create_line(x1, y1, x2, y2, fill=color, width=width, dash=dash)
             
             # Draw load info
-            mx = (e.n1.x + e.n2.x) / 2
-            my = (e.n1.y + e.n2.y) / 2
+            mx = (x1 + x2) / 2
+            my = (y1 + y2) / 2
             cap_text = f"{e.carga_atual}/{e.capacidade_maxima}"
             self.canvas.create_rectangle(mx-35, my-15, mx+35, my+10, fill="#3B4252", outline="#4C566A")
             self.canvas.create_text(mx, my-2, text=cap_text, fill=color, font=("Arial", 9, "bold"))
